@@ -45,23 +45,27 @@ sonar {
 }
 
 
-// JaCoCo config
+// JaCoCo configuration
 jacoco {
 	toolVersion = "0.8.15"
 }
 
-// Coverage report generation
+// Configure test execution
+tasks.named('test') {
+	useJUnitPlatform()
+	finalizedBy tasks.named('jacocoTestReport')
+}
+
+// Generate JaCoCo coverage reports
 tasks.named('jacocoTestReport') {
 	dependsOn tasks.named('test')
 
 	reports {
 		xml.required = true
+		xml.outputLocation = layout.buildDirectory.file(
+				"reports/jacoco/test/jacocoTestReport.xml"
+		)
 		html.required = true
 		csv.required = false
 	}
-}
-
-// Automatically generate the report after the tests
-tasks.named('test') {
-	finalizedBy tasks.named('jacocoTestReport')
 }
