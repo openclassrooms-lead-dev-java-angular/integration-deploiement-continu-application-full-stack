@@ -78,13 +78,8 @@ jobs:
       # 9. Verify coverage reports
       - name: Verify coverage reports
         run: |
-          echo "=== Backend JaCoCo ==="
-          ls -la back/build/reports/jacoco/test/
           test -f back/build/reports/jacoco/test/jacocoTestReport.xml
-      
-          echo "=== Frontend LCOV ==="
-          ls -la front/coverage/
-          test -f front/coverage/lcov.info
+          test -f front/coverage/microcrm/lcov.info
 
     # 10. Upload coverage reports
       - name: Upload coverage reports
