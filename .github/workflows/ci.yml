@@ -48,7 +48,7 @@ jobs:
 
       # 3. Gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       # 4. Backend tests and JaCoCo
       - name: Build backend and generate JaCoCo report
@@ -115,7 +115,7 @@ jobs:
 
       # 3. Gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       # 4. Compile backend without rerunning tests
       - name: Compile backend
@@ -150,7 +150,7 @@ jobs:
 
       # 7. SonarQube Cloud analysis
       - name: SonarQube Cloud analysis
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
