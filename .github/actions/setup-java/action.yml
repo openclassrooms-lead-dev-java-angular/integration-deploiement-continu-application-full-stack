@@ -1,0 +1,14 @@
+name: Setup Java
+description: Configure Java 17 and Gradle cache
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+        cache: gradle
+        cache-dependency-path: back/gradle/wrapper/gradle-wrapper.properties
+

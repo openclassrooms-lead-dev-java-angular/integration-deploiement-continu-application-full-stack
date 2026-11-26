@@ -1,0 +1,12 @@
+name: Setup Node.js
+description: Configure Node.js and npm cache
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.9.0'
+        cache: npm
+        cache-dependency-path: front/package-lock.json

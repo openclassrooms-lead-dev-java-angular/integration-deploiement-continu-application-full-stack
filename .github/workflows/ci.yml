@@ -1,0 +1,93 @@
+name: MicroCRM - CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - preprod
+      - ci-setup-github-actions
+
+  pull_request:
+    branches:
+      - main
+      - develop
+      - preprod
+
+  schedule:
+    # Runs daily at 02:00 UTC
+    - cron: "0 2 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: microcrm-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ==========================================
+  # JOB 1 : BUILD AND TESTS
+  # ==========================================
+  test:
+    name: Build and tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Java 17
+      - name: Set up Java 17
+        uses: ./.github/actions/setup-java
+
+      # 3. Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # 4. Backend tests and JaCoCo
+      - name: Build backend and generate JaCoCo report
+        working-directory: back
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build jacocoTestReport --no-daemon
+
+      # 5. Node.js
+      - name: Set up Node.js
+        uses: ./.github/actions/setup-node
+
+      # 6. Frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: front
+        run: npm ci
+
+      # 7. Angular build
+      - name: Build frontend
+        working-directory: front
+        run: npx ng build --optimization
+
+      # 8. Angular tests and LCOV
+      - name: Run frontend tests with coverage
+        working-directory: front
+        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
+
+      # 9. Verify coverage reports
+      - name: Verify coverage reports
+        run: |
+          test -f back/build/reports/jacoco/test/jacocoTestReport.xml
+          test -f front/coverage/lcov.info
+
+      # 10. Upload coverage reports
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            back/build/reports/jacoco/test/jacocoTestReport.xml
+            front/coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 1
