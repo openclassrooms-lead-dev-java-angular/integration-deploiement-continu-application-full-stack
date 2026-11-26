@@ -139,23 +139,21 @@ jobs:
           path: .
 
       # 8. Verify downloaded reports
-      - name: Verify coverage reports
+      - name: Verify downloaded reports
+        shell: bash
         run: |
           echo "=== Downloaded artifact structure ==="
           find . -type f \( -name "jacocoTestReport.xml" -o -name "lcov.info" \)
-      
-          echo "=== Frontend coverage directory ==="
-          ls -la front/coverage/ || true
-      
+          
           echo "=== Backend JaCoCo ==="
-    
-          test -f back/build/reports/jacoco/test/jacocoTestReport.xml
+          test -f "back/build/reports/jacoco/test/jacocoTestReport.xml" || exit 1
+          echo "JaCoCo report found."
           
           echo "=== Frontend LCOV ==="
-          ls -la front/coverage/
-          back/build/reports/jacoco/test/jacocoTestReport.xml
+          test -f "front/coverage/microcrm/lcov.info" || exit 1
+          echo "LCOV report found."
           
-          test -f front/coverage/microcrm/lcov.info
+          echo "All coverage reports are available."
 
       # 9. SonarQube Cloud analysis
       - name: SonarQube Cloud analysis
@@ -167,7 +165,7 @@ jobs:
           args: >
             -Dsonar.qualitygate.wait=true
             -Dsonar.coverage.jacoco.xmlReportPaths=back/build/reports/jacoco/test/jacocoTestReport.xml
-            -Dsonar.javascript.lcov.reportPaths=front/coverage/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=front/coverage/microcrm/lcov.info
             -Dsonar.java.binaries=back/build/classes/java/main
 
   # ==========================================
