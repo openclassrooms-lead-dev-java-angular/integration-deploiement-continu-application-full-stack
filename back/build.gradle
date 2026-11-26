@@ -3,6 +3,12 @@ plugins {
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'com.adarshr.test-logger' version '4.0.0'
+
+	// Code quality analysis
+	id 'org.sonarqube' version '7.6.0.18749'
+
+	// Tests coverage
+	id 'jacoco'
 }
 
 group = 'com.openclassroom.devops.orion'
@@ -28,4 +34,34 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// Sonar config
+sonar {
+	properties {
+		property 'sonar.projectKey', 'openclassrooms-lead-dev-java-angular_integration-deploiement-continu-application-full-stack'
+		property 'sonar.organization', 'openclassrooms-lead-dev-java-angular'
+	}
+}
+
+
+// JaCoCo config
+jacoco {
+	toolVersion = "0.8.15"
+}
+
+// Coverage report generation
+tasks.named('jacocoTestReport') {
+	dependsOn tasks.named('test')
+
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
+}
+
+// Automatically generate the report after the tests
+tasks.named('test') {
+	finalizedBy tasks.named('jacocoTestReport')
 }
