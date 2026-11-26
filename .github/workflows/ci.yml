@@ -81,7 +81,7 @@ jobs:
           test -f back/build/reports/jacoco/test/jacocoTestReport.xml
           test -f front/coverage/microcrm/lcov.info
 
-    # 10. Upload coverage reports
+      # 10. Upload coverage reports
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         with:
@@ -91,3 +91,72 @@ jobs:
             front/coverage/lcov.info
           if-no-files-found: error
           retention-days: 1
+
+  # ==========================================
+  # JOB 2 : SONARQUBE CLOUD
+  # ==========================================
+  sonarqube:
+    name: SonarQube Cloud analysis
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Java 17
+      - name: Set up Java 17
+        uses: ./.github/actions/setup-java
+
+      # 3. Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # 4. Compile backend without rerunning tests
+      - name: Compile backend
+        working-directory: back
+        run: |
+          chmod +x ./gradlew
+          ./gradlew classes --no-daemon
+
+      # 5. Node.js
+      - name: Set up Node.js
+        uses: ./.github/actions/setup-node
+
+      # 6. Install frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: front
+        run: npm ci
+
+      # 7. Download coverage reports
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: .
+
+      # 8. Verify downloaded reports
+      - name: Verify coverage reports
+        run: |
+          test -f back/build/reports/jacoco/test/jacocoTestReport.xml
+          test -f front/coverage/lcov.info
+
+      # 9. SonarQube Cloud analysis
+      - name: SonarQube Cloud analysis
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.coverage.jacoco.xmlReportPaths=back/build/reports/jacoco/test/jacocoTestReport.xml
+            -Dsonar.javascript.lcov.reportPaths=front/coverage/lcov.info
+            -Dsonar.java.binaries=back/build/classes/java/main
+
+    # ==========================================
+    # JOB 3 : BUILD AND DEPLOY
+    # ==========================================
