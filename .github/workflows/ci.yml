@@ -6,7 +6,7 @@ on:
       - main
       - develop
       - preprod
-      - ci-setup-github-actions
+      - ci/setup-github-actions
 
   pull_request:
     branches:
