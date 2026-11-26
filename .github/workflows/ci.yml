@@ -142,6 +142,10 @@ jobs:
       - name: Verify coverage reports
         run: |
           test -f back/build/reports/jacoco/test/jacocoTestReport.xml
+          
+          echo "=== Frontend LCOV ==="
+          ls -la front/coverage/
+          
           test -f front/coverage/microcrm/lcov.info
 
       # 9. SonarQube Cloud analysis
