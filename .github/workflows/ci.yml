@@ -78,11 +78,10 @@ jobs:
       # 9. Verify coverage reports
       - name: Verify coverage reports
         run: |
-          test -f back/build/reports/jacoco/test/jacocoTestReport.xml
-          test -f front/coverage/lcov.info
           ls -la back/build/reports/jacoco/test/
           test -f back/build/reports/jacoco/test/jacocoTestReport.xml
-    
+          test -f back/build/reports/jacoco/test/jacocoTestReport.xml
+          test -f front/coverage/lcov.info
 
     # 10. Upload coverage reports
       - name: Upload coverage reports
