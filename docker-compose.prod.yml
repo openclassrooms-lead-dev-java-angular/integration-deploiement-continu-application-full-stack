@@ -1,0 +1,36 @@
+services:
+  microcrm-back:
+    container_name: microcrm-back
+    image: microcrm-back:local
+    build:
+      context: ./back
+      dockerfile: docker/production/Dockerfile
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - microcrm-api-network
+
+  microcrm-front:
+    container_name: microcrm-front
+    image: microcrm-front:local
+    build:
+      context: ./front
+      dockerfile: docker/production/Dockerfile
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - microcrm-back
+    networks:
+      - microcrm-api-network
+      - microcrm-front-network
+
+networks:
+  microcrm-front-network:
+    driver: bridge
+
+  microcrm-api-network:
+    driver: bridge
+    internal: true
