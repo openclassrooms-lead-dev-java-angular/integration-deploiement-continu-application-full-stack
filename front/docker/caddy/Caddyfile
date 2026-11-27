@@ -1,0 +1,22 @@
+
+{
+    auto_https off
+}
+
+http://:80 {
+  encode gzip
+
+  # Rerouting API requests to Spring Boot
+  @api path /organizations* /persons* /profile*
+
+  handle @api {
+    reverse_proxy microcrm-back:8080
+  }
+
+  # Serving the Angular application
+  handle {
+      root * /usr/share/caddy
+      try_files {path} /index.html
+      file_server
+  }
+}

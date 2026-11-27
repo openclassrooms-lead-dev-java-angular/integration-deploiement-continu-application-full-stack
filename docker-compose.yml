@@ -1,0 +1,30 @@
+services:
+
+  microcrm-back:
+    container_name: microcrm-back-dev
+    build:
+      context: ./back/
+      dockerfile: docker/development/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./back/src:/app/src
+      - gradle-cache:/home/gradle/.gradle
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    restart: unless-stopped
+
+
+  microcrm-front:
+    container_name: microcrm-front-dev
+    build:
+      context: ./front/
+      dockerfile: docker/development/Dockerfile
+    depends_on:
+      - microcrm-back
+    ports:
+      - "4200:4200"
+    restart: unless-stopped
+
+volumes:
+  gradle-cache:
